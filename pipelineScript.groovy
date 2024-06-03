@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'to-do-app:latest'
-        SONARQUBE_SCANNER = 'SonarQube Scanner' 
+        SONARQUBE_SCANNER = 'SonarQube Scanner' // The name of your SonarQube scanner installation
     }
 
     stages {
@@ -22,8 +22,9 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    // Convert workspace path to Unix-style path for Docker
                     def workspace = pwd()
-                    def workspaceUnix = workspace.replace('\\', '/')
+                    def workspaceUnix = workspace.replace('\\', '/').toLowerCase()
 
                     docker.image(DOCKER_IMAGE).inside("-v ${workspaceUnix}:${workspaceUnix} -w ${workspaceUnix}") {
                         bat 'npm install'
