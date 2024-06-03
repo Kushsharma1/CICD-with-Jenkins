@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do App</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+        .todo-item.completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">To-Do App</h1>
+        <form id="todo-form" class="form-inline mb-4">
+            <input type="text" id="task" class="form-control mr-2" placeholder="Enter a new task">
+            <button type="submit" class="btn btn-primary">Add Task</button>
+        </form>
+        <ul id="todo-list" class="list-group"></ul>
+    </div>
+
+    <script>
+        document.getElementById('todo-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const task = document.getElementById('task').value;
+            if (!task) return;
+            fetch('/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ task })
+            })
+            .then(response => response.json())
+            .then(todo => {
+                addTodoToList(todo);
+                document.getElementById('task').value = '';
+            });
+        });
+
+        function addTodoToList(todo) {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center todo-item';
+            li.dataset.id = todo.id;
+            if (todo.completed) li.classList.add('completed');
+
+            const span = document.createElement('span');
+            span.textContent = todo.task;
+
+            const controls = document.createElement('div');
+            controls.className = 'btn-group';
+            controls.role = 'group';
+
+            const completeBtn = document.createElement('button');
+            completeBtn.className = 'btn btn-success btn-sm';
+            completeBtn.textContent = 'Complete';
+            completeBtn.addEventListener('click', () => toggleComplete(todo.id));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-danger btn-sm';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
+
+            controls.appendChild(completeBtn);
+            controls.appendChild(deleteBtn);
+
+            li.appendChild(span);
+            li.appendChild(controls);
+
+            document.getElementById('todo-list').appendChild(li);
+        }
+
+        function toggleComplete(id) {
+            const todoItem = document.querySelector(`li[data-id='${id}']`);
+            const isCompleted = todoItem.classList.contains('completed');
+            fetch(`/todos/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ completed: !isCompleted })
+            })
+            .then(response => response.json())
+            .then(todo => {
+                if (todo.completed) {
+                    todoItem.classList.add('completed');
+                } else {
+                    todoItem.classList.remove('completed');
+                }
+            });
+        }
+
+        function deleteTodo(id) {
+            fetch(`/todos/${id}`, {
+                method: 'DELETE'
+            })
+            .then(() => {
+                const todoItem = document.querySelector(`li[data-id='${id}']`);
+                todoItem.remove();
+            });
+        }
+
+        // Load existing todos on page load
+        fetch('/todos')
+            .then(response => response.json())
+            .then(todos => {
+                todos.forEach(addTodoToList);
+            });
+    </script>
+</body>
+</html>
