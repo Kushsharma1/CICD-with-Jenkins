@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'to-do-app:latest'
-        SONARQUBE_SCANNER = 'SonarQube' // Ensure this matches the configured tool name
+        SONARQUBE_SCANNER = 'SonarScanner' // Ensure this matches the configured tool name
     }
 
     stages {
@@ -31,7 +31,7 @@ pipeline {
                 script {
                     def scannerHome = tool name: SONARQUBE_SCANNER, type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('SonarQube') {
-                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\" -Dsonar.projectKey=To-do-app -Dsonar.projectName=To-do-app -Dsonar.projectVersion=1.0 -Dsonar.sources=."
                     }
                 }
             }
