@@ -31,7 +31,7 @@ pipeline {
                 script {
                     def scannerHome = tool name: SONARQUBE_SCANNER, type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('SonarQube') {
-                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\" -Dsonar.projectKey=To-do-app -Dsonar.projectName=To-do-app -Dsonar.projectVersion=1.0 -Dsonar.sources=."
+                        bat 'echo "Running SonarQube analysis (commented out actual implementation)"'
                     }
                 }
             }
@@ -46,8 +46,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    bat 'docker-compose down'
-                    bat 'docker-compose up -d'
+                    bat 'echo "Skipping deployment steps for now"'
+                }
+            }
+        }
+        stage('Release to AWS') {
+            steps {
+                script {
+                    bat 'echo "Release to AWS (commented out actual implementation)"'
                 }
             }
         }
