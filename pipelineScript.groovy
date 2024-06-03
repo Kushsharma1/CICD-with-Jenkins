@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'to-do-app:latest' // Change to your preferred image name
+        DOCKER_IMAGE = 'to-do-app:latest'
         SONARQUBE_SCANNER = 'SonarQube Scanner' // The name of your SonarQube scanner installation
     }
 
@@ -15,17 +15,15 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE)
+                    bat 'docker build -t to-do-app:latest .'
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    docker.image(DOCKER_IMAGE).inside {
-                        sh 'npm install'
-                        sh 'npm test'
-                    }
+                    bat 'docker run --rm to-do-app:latest npm install'
+                    bat 'docker run --rm to-do-app:latest npm test'
                 }
             }
         }
@@ -33,8 +31,8 @@ pipeline {
             steps {
                 script {
                     def scannerHome = tool name: SONARQUBE_SCANNER
-                    withSonarQubeEnv('SonarQube') { // Assume SonarQube server is named 'SonarQube'
-                        sh "${scannerHome}/bin/sonar-scanner"
+                    withSonarQubeEnv('SonarQube') {
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
                     }
                 }
             }
@@ -42,8 +40,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d'
+                    bat 'docker-compose down'
+                    bat 'docker-compose up -d'
                 }
             }
         }
