@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'to-do-app:latest'
-        SONARQUBE_SCANNER = 'SonarQube Scanner' // The name of your SonarQube scanner installation
+        SONARQUBE_SCANNER = 'SonarQube' // Ensure this matches the configured tool name
     }
 
     stages {
@@ -22,18 +22,24 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Temporarily skipping tests to avoid failures
                     bat 'echo "Skipping tests for now"'
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool name: SONARQUBE_SCANNER, type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                    withSonarQubeEnv('SonarQube') {
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
+                    }
                 }
             }
         }
         stage('Code Quality Analysis') {
             steps {
                 script {
-                    def scannerHome = tool name: SONARQUBE_SCANNER
-                    withSonarQubeEnv('SonarQube') {
-                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
-                    }
+                    bat 'echo "Skipping code quality analysis for now"'
                 }
             }
         }
