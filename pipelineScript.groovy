@@ -15,15 +15,15 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    bat 'docker build -t %DOCKER_IMAGE% .'
+                    bat 'docker build -t to-do-app:latest .'
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    bat 'docker run --rm %DOCKER_IMAGE% npm install'
-                    bat 'docker run --rm %DOCKER_IMAGE% npm test'
+                    bat 'docker run --rm to-do-app:latest npm install'
+                    bat 'docker run --rm to-do-app:latest npm test'
                 }
             }
         }
