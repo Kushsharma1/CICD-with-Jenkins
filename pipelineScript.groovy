@@ -3,7 +3,6 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'to-do-app:latest'
-        SONARQUBE_SCANNER = 'SonarScanner' // Ensure this matches the configured tool name
     }
 
     stages {
@@ -29,10 +28,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    def scannerHome = tool name: SONARQUBE_SCANNER, type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                    withSonarQubeEnv('SonarQube') {
-                        bat 'echo "Running SonarQube analysis (commented out actual implementation)"'
-                    }
+                    bat 'echo "Skipping SonarQube analysis for now"'
                 }
             }
         }
