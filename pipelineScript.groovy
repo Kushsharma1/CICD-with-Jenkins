@@ -22,11 +22,9 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Convert workspace path to Unix-style path for Docker
-                    def workspace = pwd()
-                    def workspaceUnix = workspace.replace('\\', '/').toLowerCase()
+                    def workspace = pwd().replace('\\', '/')
 
-                    docker.image(DOCKER_IMAGE).inside("-v ${workspaceUnix}:${workspaceUnix} -w ${workspaceUnix}") {
+                    docker.image(DOCKER_IMAGE).inside {
                         bat 'npm install'
                         bat 'npm test'
                     }
@@ -38,7 +36,7 @@ pipeline {
                 script {
                     def scannerHome = tool name: SONARQUBE_SCANNER
                     withSonarQubeEnv('SonarQube') {
-                        bat "${scannerHome}/bin/sonar-scanner"
+                        bat "${scannerHome}/bin/sonar-scanner.bat"
                     }
                 }
             }
