@@ -15,23 +15,15 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE)
+                    bat 'docker build -t %DOCKER_IMAGE% .'
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    def workspace = pwd().replace('\\', '/')
-                    def workspaceWin = pwd()
-
-                    docker.image(DOCKER_IMAGE).inside {
-                        bat """
-                        cd ${workspaceWin}
-                        npm install
-                        npm test
-                        """
-                    }
+                    bat 'docker run --rm %DOCKER_IMAGE% npm install'
+                    bat 'docker run --rm %DOCKER_IMAGE% npm test'
                 }
             }
         }
@@ -40,9 +32,7 @@ pipeline {
                 script {
                     def scannerHome = tool name: SONARQUBE_SCANNER
                     withSonarQubeEnv('SonarQube') {
-                        bat """
-                        ${scannerHome}\\bin\\sonar-scanner.bat
-                        """
+                        bat "\"${scannerHome}\\bin\\sonar-scanner.bat\""
                     }
                 }
             }
